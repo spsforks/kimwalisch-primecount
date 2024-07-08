@@ -18,7 +18,7 @@
 ///        the SegmentedPiTable are described in more detail in:
 ///        https://github.com/kimwalisch/primecount/blob/master/doc/Easy-Special-Leaves.md
 ///
-/// Copyright (C) 2023 Kim Walisch, <kim.walisch@gmail.com>
+/// Copyright (C) 2024 Kim Walisch, <kim.walisch@gmail.com>
 ///
 /// This file is distributed under the BSD License. See the COPYING
 /// file in the top level directory.
@@ -28,6 +28,7 @@
 #define SEGMENTEDPITABLE_HPP
 
 #include <BitSieve240.hpp>
+#include <fast_div.hpp>
 #include <macros.hpp>
 #include <Vector.hpp>
 #include <popcnt.hpp>
@@ -78,9 +79,11 @@ public:
       return pi_tiny_[x];
 
     x -= low_;
-    uint64_t count = pi_[x / 240].count;
-    uint64_t bits = pi_[x / 240].bits;
-    uint64_t bitmask = unset_larger_[x % 240];
+    uint64_t x_div_240 = x / 240;
+    uint64_t x_mod_240 = fast_mod_240(x, x_div_240);
+    uint64_t count = pi_[x_div_240].count;
+    uint64_t bits = pi_[x_div_240].bits;
+    uint64_t bitmask = unset_larger_[x_mod_240];
     return count + popcnt64(bits & bitmask);
   }
 

@@ -18,6 +18,7 @@
 #define PITABLE_HPP
 
 #include <BitSieve240.hpp>
+#include <fast_div.hpp>
 #include <popcnt.hpp>
 #include <macros.hpp>
 #include <Vector.hpp>
@@ -49,9 +50,11 @@ public:
     if_unlikely(x < pi_tiny_.size())
       return pi_tiny_[x];
 
-    uint64_t count = pi_[x / 240].count;
-    uint64_t bits = pi_[x / 240].bits;
-    uint64_t bitmask = unset_larger_[x % 240];
+    uint64_t x_div_240 = x / 240;
+    uint64_t x_mod_240 = fast_mod_240(x, x_div_240);
+    uint64_t count = pi_[x_div_240].count;
+    uint64_t bits = pi_[x_div_240].bits;
+    uint64_t bitmask = unset_larger_[x_mod_240];
     return count + popcnt64(bits & bitmask);
   }
 
@@ -61,9 +64,11 @@ public:
     if_unlikely(x < pi_tiny_.size())
       return pi_tiny_[x];
 
-    uint64_t count = pi_cache_[x / 240].count;
-    uint64_t bits = pi_cache_[x / 240].bits;
-    uint64_t bitmask = unset_larger_[x % 240];
+    uint64_t x_div_240 = x / 240;
+    uint64_t x_mod_240 = fast_mod_240(x, x_div_240);
+    uint64_t count = pi_cache_[x_div_240].count;
+    uint64_t bits = pi_cache_[x_div_240].bits;
+    uint64_t bitmask = unset_larger_[x_mod_240];
     return count + popcnt64(bits & bitmask);
   }
 

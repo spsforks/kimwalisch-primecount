@@ -37,6 +37,7 @@
 #ifndef SIEVE_HPP
 #define SIEVE_HPP
 
+#include <fast_div.hpp>
 #include <macros.hpp>
 #include <popcnt.hpp>
 #include <Vector.hpp>
@@ -157,8 +158,10 @@ private:
     ASSERT(stop - start < segment_size());
     uint64_t start_idx = start / 240;
     uint64_t stop_idx = stop / 240;
-    uint64_t m1 = unset_smaller[start % 240];
-    uint64_t m2 = unset_larger[stop % 240];
+    uint64_t start_mod_240 = fast_mod_240(start, start_idx);
+    uint64_t stop_mod_240 = fast_mod_240(stop, stop_idx);
+    uint64_t m1 = unset_smaller[start_mod_240];
+    uint64_t m2 = unset_larger[stop_mod_240];
     uint64_t* sieve64 = (uint64_t*) sieve_.data();
 
     if (start_idx == stop_idx)
@@ -194,8 +197,10 @@ private:
     ASSERT(stop - start < segment_size());
     uint64_t start_idx = start / 240;
     uint64_t stop_idx = stop / 240;
-    uint64_t m1 = unset_smaller[start % 240];
-    uint64_t m2 = unset_larger[stop % 240];
+    uint64_t start_mod_240 = fast_mod_240(start, start_idx);
+    uint64_t stop_mod_240 = fast_mod_240(stop, stop_idx);
+    uint64_t m1 = unset_smaller[start_mod_240];
+    uint64_t m2 = unset_larger[stop_mod_240];
     uint64_t* sieve64 = (uint64_t*) sieve_.data();
 
     if (start_idx == stop_idx)

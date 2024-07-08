@@ -33,6 +33,29 @@
 
 namespace {
 
+/// Calculates x % 240.
+/// GCC's default algorithm for calculating integer modulo by a
+/// constant is not optimal (for GCC <= 14) on the x64 CPU
+/// architecture. GCC calculates q * 240 using multiple shift
+/// instructions instead of a multiplication. Hence we use inline
+/// assembly to force GCC to calculate q * 240 using a
+/// multiplication instruction.
+/// https://gcc.gnu.org/bugzilla/show_bug.cgi?id=115749
+///
+ALWAYS_INLINE uint64_t fast_mod_240(uint64_t x, uint64_t x_div_240)
+{
+#if defined(__GNUC__) && \
+   !defined(__clang__) && \
+    defined(__x86_64__)
+  // res = x_div_240 * 240
+  uint64_t res;
+  __asm__("imul $240, %1, %0" : "=r" (res) : "r" (x_div_240));
+  return x - res;
+#else
+  return x - x_div_240 * 240;
+#endif
+}
+
 /// Used for (64-bit / 32-bit) = 64-bit.
 template <typename X, typename Y>
 ALWAYS_INLINE typename std::enable_if<(sizeof(X) == sizeof(uint64_t) &&
